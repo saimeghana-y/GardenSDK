@@ -1,9 +1,4 @@
-# Demo App
 
-This project demonstrates how to use the [Garden SDK](https://docs.garden.finance/developers/sdk/) to create a simple dApp for swapping from WBTC to BTC.
-
-> [!NOTE]
-> For better developer experience, we are conducting the swap on a local network, but you can do the same on Testnet or Mainnet by changing the parameters.
 
 ## Features
 
@@ -63,8 +58,4 @@ bun install
 ```bash
 bun run dev
 ```
-
-The dApp should look something like this
-
-![final_dapp](https://github.com/Sushants-Git/demo-app/assets/100516354/bf939a2f-3ac1-40f6-882c-c779ee4928ee)
 
