@@ -15,11 +15,17 @@ const SwapComponent: React.FC = () => {
   const [direction, setDirection] = useState<"BTC_TO_WBTC" | "WBTC_TO_BTC">("WBTC_TO_BTC");
 
   const changeAmount = (of: "WBTC" | "BTC", value: string) => {
-    if (direction === "WBTC_TO_BTC") {
+
+    if (of === "WBTC") {
+
       handleWBTCChange(value);
-    } else {
+
+    } else if (of === "BTC") {
+
       handleBTCChange(value);
+
     }
+
   };
 
   const handleWBTCChange = (value: string) => {
@@ -170,6 +176,8 @@ type SwapAndAddressComponentProps = {
 const Swap: React.FC<SwapAndAddressComponentProps> = ({ amount, changeAmount, direction }) => {
   const { garden, bitcoin } = useGarden();
   const [btcAddress, setBtcAddress] = useState<string>();
+  const [ethAddress, setEthAddress] = useState<string>();
+
   const { metaMaskIsConnected } = useMetaMaskStore();
   const { wbtcAmount, btcAmount } = amount;
 
@@ -186,6 +194,25 @@ const Swap: React.FC<SwapAndAddressComponentProps> = ({ amount, changeAmount, di
     getAddress();
   }, [bitcoin, isSigned]);
 
+
+  useEffect(() => {
+
+    const getEthAddress = async () => {
+
+      if (metaMaskIsConnected) {
+
+        const accounts = await window.ethereum.request({ method: "eth_accounts" });
+
+        setEthAddress(accounts[0]);
+
+      }
+
+    };
+
+    getEthAddress();
+
+  }, [metaMaskIsConnected]);
+
   const handleSwap = async () => {
     if (
       !garden ||
@@ -195,7 +222,7 @@ const Swap: React.FC<SwapAndAddressComponentProps> = ({ amount, changeAmount, di
       return;
 
     const sendAmount = direction === "WBTC_TO_BTC" ? Number(wbtcAmount) * 1e8 : Number(btcAmount) * 1e8;
-    const receiveAmount = direction === "WBTC_TO_BTC" ? Number(btcAmount) * 1e8 : Number(wbtcAmount) * 1e8;
+    const receiveAmount = (1 - 0.3 / 100) * sendAmount;
 
     changeAmount("WBTC", "");
 
@@ -215,8 +242,19 @@ const Swap: React.FC<SwapAndAddressComponentProps> = ({ amount, changeAmount, di
           <input
             id="receive-address"
             placeholder="Enter Address"
-            value={btcAddress ? btcAddress : ""}
-            onChange={(e) => setBtcAddress(e.target.value)}
+            value={
+
+              direction === "BTC_TO_WBTC" 
+
+                ? ethAddress 
+
+                : btcAddress ? btcAddress : ""
+
+            }
+
+            readOnly={direction === "BTC_TO_WBTC"}
+
+            onChange={(e) => direction === "BTC_TO_WBTC" ? null : setBtcAddress(e.target.value)}
           />
         </div>
       </div>
